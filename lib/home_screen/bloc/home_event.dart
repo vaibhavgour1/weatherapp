@@ -6,3 +6,12 @@ class HomeEvent extends Equatable {
 }
 
 class GetUserEvent extends HomeEvent {}
+
+class GetCityEvent extends HomeEvent {
+  final String city;
+  GetCityEvent({required this.city});
+  @override
+  List<Object?> get props => [city];
+}
+
+// class AddHistoryDataEvent extends HomeEvent {}

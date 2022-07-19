@@ -19,6 +19,13 @@ class GetUserState extends HomeState {
   List<Object?> get props => [cityData];
 }
 
+class GetCityState extends HomeState {
+  final CityData cityData;
+  GetCityState({required this.cityData});
+  @override
+  List<Object?> get props => [cityData];
+}
+
 class FailureState extends HomeState {
   final String message;
 
@@ -27,3 +34,5 @@ class FailureState extends HomeState {
   @override
   List<Object?> get props => [message];
 }
+
+// class AddHistoryDataState extends HomeState {}
