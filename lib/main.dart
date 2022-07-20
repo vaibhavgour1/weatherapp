@@ -1,5 +1,8 @@
 import 'package:auth_app/home_screen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
+Uuid uuid = const Uuid();
 
 void main() {
   runApp(const MyApp());

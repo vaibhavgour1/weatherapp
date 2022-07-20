@@ -16,7 +16,7 @@ class WeatherModel {
     this.name,
   });
 
-  String? id;
+  int? id;
   String? dt;
   String? speed;
   String? lightRain;

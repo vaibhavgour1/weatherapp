@@ -10,23 +10,23 @@ class DBConstant {
   static const TEMP = "temp";
   static const NAME = "name";
 
-  static const String CREATE_WEATHER_TABLE = "CREATE TABLE " +
-      WEATHER_TABLE +
-      "(" +
-      WEATHERID +
-      " INTEGER PRIMARY KEY AUTOINCREMENT , " +
-      DATETIME +
-      " TEXT," +
-      WIND +
-      " TEXT," +
-      LIGHTRAIN +
-      " TEXT," +
-      PRESSURE +
-      " TEXT," +
-      HUMIDITY +
-      " TEXT," +
-      TEMP +
-      " TEXT," +
-      NAME +
-      " TEXT )";
+  // static const String CREATE_WEATHER_TABLE = "CREATE TABLE " +
+  //     WEATHER_TABLE +
+  //     "(" +
+  //     WEATHERID +
+  //     " INTEGER PRIMARY KEY AUTOINCREMENT , " +
+  //     DATETIME +
+  //     " TEXT," +
+  //     WIND +
+  //     " TEXT," +
+  //     LIGHTRAIN +
+  //     " TEXT," +
+  //     PRESSURE +
+  //     " TEXT," +
+  //     HUMIDITY +
+  //     " TEXT," +
+  //     TEMP +
+  //     " TEXT," +
+  //     NAME +
+  //     " TEXT )";
 }

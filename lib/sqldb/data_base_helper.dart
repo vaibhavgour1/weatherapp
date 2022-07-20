@@ -33,7 +33,16 @@ class DatabaseHelper extends ChangeNotifier {
     String path = join(documentsDirectory.path, DBConstant.DATA_BASE_NAME);
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
-      await db.execute(DBConstant.CREATE_WEATHER_TABLE);
+      await db.execute("CREATE TABLE ${DBConstant.WEATHER_TABLE} ("
+          "${DBConstant.WEATHERID} INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+          "${DBConstant.DATETIME} TEXT NOT NULL,"
+          "${DBConstant.WIND} TEXT NOT NULL,"
+          "${DBConstant.LIGHTRAIN} TEXT NOT NULL,"
+          "${DBConstant.PRESSURE} TEXT NOT NULL,"
+          "${DBConstant.HUMIDITY} TEXT NOT NULL,"
+          "${DBConstant.TEMP} TEXT NOT NULL,"
+          "${DBConstant.NAME} TEXT NOT NULL"
+          ")");
     });
   }
 
@@ -43,53 +52,44 @@ class DatabaseHelper extends ChangeNotifier {
     try {
       final db = await getDatabase();
 
-      // bool exist = await checkGiftExist(giftDataModel.id.toString());
-
-      // if (exist) {
-      //   List<Map<String, dynamic>> data = await db.query(DBConstant.CART_TABLE,
-      //       columns: [DBConstant.QUANTITY],
-      //       where: DBConstant.GIFT_ID + "= ? AND " + DBConstant.USER_ID + "= ?",
-      //       whereArgs: [
-      //         giftDataModel.id.toString(),
-      //         await Utility.getStringPreference(Constant.USER_ID)
-      //       ]);
-      //
-      //   int q = data.first["quantity"] as int;
-      //
-      //   giftDataModel.quantity = giftDataModel.quantity! + q;
-      //
-      //   id = await db.update(DBConstant.CART_TABLE, giftDataModel.toMap(),
-      //       whereArgs: [
-      //         giftDataModel.id.toString(),
-      //         await Utility.getStringPreference(Constant.USER_ID)
-      //       ],
-      //       where:
-      //           DBConstant.GIFT_ID + "= ? AND " + DBConstant.USER_ID + "= ?");
-      // } else {
-      id = await db.insert(
-          DBConstant.CREATE_WEATHER_TABLE, weatherModel.toMap());
-      // }
+      var data =
+          await db.insert(DBConstant.WEATHER_TABLE, weatherModel.toMap());
+      print("data-->$data");
 
       /**
        * close database
        */
       // db.close();
     } catch (error) {
-      print('DatabaseHelper.addProductInRetrievalTable: $error');
+      print('DatabaseHelper: $error');
     }
 
     return id;
   }
 
+  // static Future<bool> checkData(
+  //     String TableName, String dbfield, String fieldValue) async {
+  //   bool isExist = false;
+  //   final db = await getDatabase();
+  //   String Query =
+  //       "Select * from " + TableName + " where " + dbfield + " = " + fieldValue;
+  //   List<Map> result = await db.rawQuery(Query);
+  //   if (result.length > 0) {
+  //     isExist = true;
+  //   }
+  //   return isExist;
+  // }
+
   static Future<List<WeatherModel>> getWeatherData() async {
+    print("getWeatherData-->");
     List<WeatherModel> userdata = [];
 
     try {
       final db = await getDatabase();
-      String selectQuery =
-          "SELECT  * FROM ${DBConstant.CREATE_WEATHER_TABLE} WHERE ${DBConstant.WEATHERID}= ?";
+      // String selectQuery =
+      //     "SELECT  * FROM ${} WHERE ${DBConstant.WEATHERID}= ?";
       List<Map<String, dynamic>> data =
-          await db.rawQuery(selectQuery, [DBConstant.WEATHERID]);
+          await db.rawQuery("SELECT * FROM ${DBConstant.WEATHER_TABLE}");
 
       if (data.isNotEmpty) {
         data.forEach((element) {

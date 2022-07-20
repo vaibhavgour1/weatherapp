@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../main.dart';
+import '../sqldb/utility.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -19,17 +22,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   HomeBloc bloc = HomeBloc();
   List<WeatherModel> userdata = [];
+  List<WeatherModel> userdatareverd = [];
   CityData? cityData;
+
+  String cityName = "";
 
   @override
   void initState() {
     bloc.add(GetUserEvent());
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottum = MediaQuery.of(context).viewPadding.bottom;
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
 
@@ -40,31 +47,38 @@ class _HomeScreenState extends State<HomeScreen> {
             child: BlocBuilder<HomeBloc, HomeState>(
               builder: (context, state) {
                 if (state is GetUserState) {
+                  int id = new DateTime.now().millisecondsSinceEpoch;
                   cityData = state.cityData;
+                  cityName = cityData!.list!.first.name;
+                  print("uuid.hashCode-->${uuid.hashCode}");
                   WeatherModel data = WeatherModel(
-                      id: cityData!.list!.first.id,
+                      id: id,
                       name: cityData!.list!.first.name,
                       dt: cityData!.list!.first.dt.toString(),
                       speed: cityData!.list!.first.wind!.speed.toString(),
                       humidity: cityData!.list!.first.main!.humidity.toString(),
-                      lightRain: cityData!.list!.first.rain,
+                      lightRain: cityData!.list!.first.rain ?? "not",
                       pressure: cityData!.list!.first.main!.pressure,
                       temp: cityData!.list!.first.main!.temp);
                   init(data);
-                  print(state.cityData.count);
+                  Utility.setStringPreference(Utility.userId, id.toString());
+                  print("data--->${data.toMap()}");
                 }
                 if (state is GetCityState) {
+                  int id = new DateTime.now().millisecondsSinceEpoch;
                   cityData = state.cityData;
+                  cityName = cityData!.list!.first.name;
                   WeatherModel data = WeatherModel(
-                      id: cityData!.list!.first.id,
+                      id: id,
                       name: cityData!.list!.first.name,
                       dt: cityData!.list!.first.dt.toString(),
                       speed: cityData!.list!.first.wind!.speed.toString(),
                       humidity: cityData!.list!.first.main!.humidity.toString(),
-                      lightRain: cityData!.list!.first.rain,
+                      lightRain: cityData!.list!.first.rain ?? "not",
                       pressure: cityData!.list!.first.main!.pressure,
                       temp: cityData!.list!.first.main!.temp);
                   init(data);
+                  Utility.setStringPreference(Utility.userId, id.toString());
                   print(state.cityData.count);
                 }
                 if (state is WaitingState) {
@@ -83,8 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
-                      height: MediaQuery.of(context).size.height * 0.37,
-                      width: MediaQuery.of(context).size.width,
+                      height: h * 0.45,
+                      width: w,
                       color: Colors.blue,
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
@@ -96,10 +110,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
-                                children: const [
+                                children: [
                                   Text(
-                                    "London,GB",
-                                    style: TextStyle(
+                                    cityName,
+                                    style: const TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold),
@@ -122,7 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           // delegate to customize the search bar
                                           delegate: CustomSearchDelegate());
                                       print("x----$x");
-                                      bloc.add(GetCityEvent(city: x));
+                                      if (x != null) {
+                                        bloc.add(GetCityEvent(city: x));
+                                      }
                                     },
                                     icon: const Icon(Icons.search_outlined,
                                         color: Colors.white, size: 25),
@@ -270,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          itemCount: userdata.length,
+                          itemCount: userdatareverd.reversed.length,
                           itemBuilder: (context, index) {
                             return Column(
                               children: [
@@ -290,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                "${DateFormat("EEE dd.mm.yyyy - hh:ss").format(DateTime.parse(userdata[index].dt.toString()))}",
+                                                "${DateFormat("EEE dd.mm.yyyy - hh:ss").format(DateTime.parse(userdatareverd[index].dt.toString()))}",
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 14,
@@ -303,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                "Light Rain (${userdata[index].lightRain} mm)",
+                                                "Light Rain (${userdatareverd[index].lightRain} mm)",
                                                 style: TextStyle(
                                                     fontWeight:
                                                         FontWeight.normal,
@@ -318,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                "Wind: (${userdata[index].speed.toString()} m/s)",
+                                                "Wind: (${userdatareverd[index].speed.toString()} m/s)",
                                                 style: TextStyle(
                                                     fontWeight:
                                                         FontWeight.normal,
@@ -333,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                "Pressure: (${userdata[index].pressure.toString()} hpa)",
+                                                "Pressure: (${userdatareverd[index].pressure.toString()} hpa)",
                                                 style: TextStyle(
                                                     fontWeight:
                                                         FontWeight.normal,
@@ -348,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                "Humidity: (${userdata[index].humidity.toString()} %)",
+                                                "Humidity: (${userdatareverd[index].humidity.toString()} %)",
                                                 style: TextStyle(
                                                     fontWeight:
                                                         FontWeight.normal,
@@ -371,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               height: 10,
                                             ),
                                             Text(
-                                              "${userdata[index].temp.toString()} C",
+                                              "${userdatareverd[index].temp.toString()} C",
                                               style: TextStyle(
                                                 color: Colors.grey.shade600,
                                                 fontSize: 18,
@@ -392,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         horizontal: 5,
                                                         vertical: 0),
                                                 child: Text(
-                                                  "${userdata[index].name.toString()}",
+                                                  "${userdatareverd[index].name.toString()}",
                                                   style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 10,
@@ -424,7 +440,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void init(WeatherModel data) async {
     await DatabaseHelper.addWeatherData(data);
-    // userdata = await DatabaseHelper.getWeatherData();
+    userdata = await DatabaseHelper.getWeatherData();
+    userdatareverd = userdata.reversed.toList();
   }
 }
 
